@@ -127,9 +127,11 @@ ggplot(data, aes(x = t_img_date)) +
   geom_line(stat = "count", aes(group = 1)) +
   labs(x = "Date", y = "Count", title = "Number of Images Over Time")
 
-base_map <- get_stamenmap(bbox = c(left = min(data$xlong), bottom = min(data$ylat), 
+
+register_stadiamaps("f94c64ea-35d9-425f-af7a-e139e3bd6242", write = TRUE)
+base_map <- get_stadiamap(bbox = c(left = min(data$xlong), bottom = min(data$ylat), 
                                    right = max(data$xlong), top = max(data$ylat)), 
-                          zoom = 6, maptype = "terrain-background")
+                          zoom = 6, maptype = "stamen_toner_lite")
 
 # Now plot the map with points
 ggmap(base_map) +
