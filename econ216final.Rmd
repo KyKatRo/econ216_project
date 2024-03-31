@@ -31,36 +31,6 @@ head(data)
 summary(data)
 ```
 
-## Histograms and Bar Plots
-
-
-```{r}
-# Histogram for 'p_cap'
-ggplot(data, aes(x = p_cap)) +
-  geom_histogram(bins = 30, fill = "blue", color = "black") +
-  labs(x = "Capacity (MW)", y = "Frequency", title = "Histogram of Capacity")
-
-# Histogram for 't_hh'
-ggplot(data, aes(x = t_hh)) +
-  geom_histogram(bins = 30, fill = "green", color = "black") +
-  labs(x = "Turbine Hub Height (m)", y = "Frequency", title = "Histogram of Turbine Hub Height")
-
-# Bar plot for 't_state'
-ggplot(data, aes(x = t_state)) +
-  geom_bar(stat = "count", fill = "coral") +
-  labs(x = "State", y = "Count", title = "Bar Plot of States") + 
-theme(axis.text.x = element_text(angle = 60, hjust = 1))
-
-
-
-# Scatter plot for geographic coordinates 'xlong' and 'ylat'
-ggplot(data, aes(x = xlong, y = ylat)) +
-  geom_point(aes(color = t_state)) +
-  labs(x = "Longitude", y = "Latitude", title = "Geographic Distribution of Turbines")
-
-
-```
-
 ## Exploring Relationships
 
 Analyze relationships between variables using scatter plots, box plots, etc.
@@ -81,40 +51,60 @@ ggplot(data, aes(x = factor_variable_1, y = continuous_variable_1)) +
 ```
 
 ```{r}
-# Histograms for continuous variables (e.g., p_cap, t_cap, t_hh, t_rd, t_rsa, t_ttlh)
+# Histograms for continuous variables
 continuous_vars <- c("p_cap", "t_cap", "t_hh", "t_rd", "t_rsa", "t_ttlh")
+continuous_titles <- c("Turbine Power Capacity (MW)", "Turbine Rated Capacity (MW)", 
+                       "Turbine Hub Height (m)", "Turbine Rotor Diameter (m)", 
+                       "Turbine Rotor Sweep Area (sq m)", "Total Turbine Height (m)")
 
-for (var in continuous_vars) {
+binwidths <- c(10, 100, 5, 2.5, 500, 5)
+
+
+for (i in 1:length(continuous_vars)) {
+  var <- continuous_vars[i]
+  title <- continuous_titles[i]
+  binwidth <- binwidths[i]
+  
   print(ggplot(data, aes_string(x = var)) +
-          geom_histogram(binwidth = 1, fill = "blue", color = "black") +
-          labs(x = var, y = "Frequency", title = paste("Distribution of", var)) +
+          geom_histogram(binwidth = binwidth, fill = "blue", color = "black") +
+          labs(x = title, y = "Frequency", title = paste("Distribution of", title)) +
           theme_minimal())
 }
 
 ```
 
 ```{r}
+# Bar plots for categorical variables
+categorical_vars <- c("t_state", "retrofit", "t_conf_atr", "t_conf_loc")
+categorical_titles <- c("State", "Retrofit Status", "Configuration Attribute", "Configuration Location")
 
-# Bar plots for categorical variables (e.g., t_state, t_county, t_manu, t_model, retrofit, t_conf_atr, t_conf_loc)
-categorical_vars <- c("t_state", "t_manu", "t_model", "retrofit", "t_conf_atr", "t_conf_loc")
-
-for (var in categorical_vars) {
+for (i in 1:length(categorical_vars)) {
+  var <- categorical_vars[i]
+  title <- categorical_titles[i]
+  
   print(ggplot(data, aes_string(x = var)) +
           geom_bar(fill = "coral", color = "black") +
-          labs(x = var, y = "Count", title = paste("Count of", var)) +
+          labs(x = title, y = "Count", title = paste("Turbine Count by", title)) +
           theme_minimal() +
           theme(axis.text.x = element_text(angle = 90, hjust = 1)))
 }
 
-# Bar plot for year variables (e.g., p_year, retrofit_year)
-year_vars <- c("p_year", "retrofit_year")
+```
 
-for (var in year_vars) {
+```{r}
+# Bar plot for year variables
+year_vars <- c("p_year", "retrofit_year")
+year_titles <- c("Production Year", "Retrofit Year")
+
+for (i in 1:length(year_vars)) {
+  var <- year_vars[i]
+  title <- year_titles[i]
+  
   data[[var]] <- as.factor(data[[var]])
   
   print(ggplot(data, aes_string(x = var)) +
           geom_bar(fill = "green", color = "black") +
-          labs(x = var, y = "Count", title = paste("Count of", var)) +
+          labs(x = title, y = "Count", title = paste("Turbine Count by", title)) +
           theme_minimal() +
           theme(axis.text.x = element_text(angle = 90, hjust = 1)))
 }
