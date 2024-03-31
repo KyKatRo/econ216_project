@@ -4,7 +4,16 @@ author: "Kyler Rosen, Raunak Bhumsaria, Gordon Bradley, and Alex Illchev"
 date: "`r Sys.Date()`"
 output: pdf_document
 ---
+##Introduction
 
+
+In this project we aim to examine the geographic distribution and capacity characteristics of wind turbines in the United States using the US Wind Turbine Database (USWTDB). We plan to do this by analyzing the placement and various attributes of wind turbines in the US in hopes of finding insights into the wind energy landscape over all 50 states.
+
+
+Using the data from the dataset we believe we can investigate the impact of local vs federal policies on wind energy development through two methods. The first is by the geographic mapping of wind turbines in the US; this can visually display where these turbines are located on a map which in turn can show us various clusters of the turbines distributions. This visualization can be used to identify areas of high wind energy concentration and relate these areas to geographic and policy factors of certain local or state governments.The second way is visualizing the number of wind turbines per each US state. This data can be compared with certain state policies or with federal wind energy incentives in each region. This can be all combined to show us which states are leading in wind energy production and possibly find patterns of wind energy adoption nationally.
+
+
+Using the data set we can also investigate the capacity distribution and also win turbine hub height of all the wind turbines in the US. This data would let us discover insights on the range, efficiency, and sizes of the turbines in terms of their power output and hub height. This could possibly allow us to look at technological trends nationally for wind turbine and even see how many advanced wind projects have been made.
 
 ## Background
 The dataset we are using is the United States Wind Turbine Database (USWTDB). We retrieved this from: https://eerscmap.usgs.gov/uswtdb/. What follows is the details about the dataset:
