@@ -21,6 +21,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(lubridate)
 library(ggmap)
+library(dplyr)
 
 us_map <- map_data("state")
 
@@ -36,23 +37,6 @@ summary(data)
 ```
 
 ## Exploring Relationships
-
-Analyze relationships between variables using scatter plots, box plots, etc.
-
-
-# Scatter plot for two continuous variables
-ggplot(data, aes(x = continuous_variable_1, y = continuous_variable_2)) + 
-  geom_point() + 
-  labs(title = "Scatter Plot of Variable 1 vs Variable 2", x = "Variable 1", y = "Variable 2")
-
-# Box plot for a continuous and a categorical variable
-ggplot(data, aes(x = factor_variable_1, y = continuous_variable_1)) + 
-  geom_boxplot() + 
-  labs(title = "Box Plot of Continuous Variable 1 by Factor Variable 1", x = "Factor Variable 1", y = "Continuous Variable 1")
-
-## Documentation of Findings
-
-```
 
 ```{r}
 # Histograms for continuous variables
@@ -116,14 +100,27 @@ for (i in 1:length(year_vars)) {
 ```
 
 ```{r}
-
 # Convert date to Date format
 data$t_img_date <- as.Date(data$t_img_date, format = "%m/%d/%Y")
 
-# Line chart for date variable 't_img_date'
 ggplot(data, aes(x = t_img_date)) +
   geom_line(stat = "count", aes(group = 1)) +
-  labs(x = "Date", y = "Count", title = "Number of Images Over Time")
+  labs(x = "Date", y = "Count", title = "Number of Images Over Time After 2015")
+
+# Filter data for dates after 2015
+data_after_2015 <- data %>%
+  filter(t_img_date > as.Date("2015-12-31"))
+
+# Aggregate data by month
+monthly_data <- data_after_2015 %>%
+  group_by(month = floor_date(t_img_date, "month")) %>%
+  summarise(count = n())
+
+ggplot(monthly_data, aes(x = month, y = count)) +
+  geom_line() +
+  labs(x = "Month", y = "Count", title = "Monthly Number of Images Over Time After 2015") +
+  theme_minimal()
+
 
 ```
 
