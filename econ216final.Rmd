@@ -85,7 +85,35 @@ head(data)
 summary(data)
 ```
 
-## Exploring Relationships
+## Data Wrangling
+```{r}
+# Convert date to Date format
+## We want it in the Date format since it allows us to do easier modifications to the variables
+data$t_img_date <- as.Date(data$t_img_date, format = "%m/%d/%Y")
+
+
+## Data pre-2015 seems very unreliable pre-2015 so I am cutting off before then.
+data_after_2015 <- data %>%
+  filter(t_img_date > as.Date("2014-12-31"))
+
+
+# Aggregate data by month
+## Data is very noisy so collecting by month makes the data bit easier to parse.
+monthly_data <- data_after_2015 %>%
+  group_by(month = floor_date(t_img_date, "month")) %>%
+  summarise(count = n())
+
+## Need to establish bounding boxes on geographic areas for the maps
+continental_bbox <- c(left = -125, bottom = 24, right = -66, top = 49)
+alaska_bbox <- c(left = -170, bottom = 52, right = -130, top = 72)
+hawaii_bbox <- c(left = -160, bottom = 18, right = -154, top = 23)
+
+## Grabbing all numeric data for a rough analysis
+numeric_data <- data %>% select_if(is.numeric)
+
+```
+
+## Exploratory Analysis
 
 ```{r}
 # Histograms for continuous variables
@@ -149,21 +177,9 @@ for (i in 1:length(year_vars)) {
 ```
 
 ```{r}
-# Convert date to Date format
-data$t_img_date <- as.Date(data$t_img_date, format = "%m/%d/%Y")
-
 ggplot(data, aes(x = t_img_date)) +
   geom_line(stat = "count", aes(group = 1)) +
   labs(x = "Date", y = "Count", title = "Number of Images Over Time After 2015")
-
-# Filter data for dates after 2015
-data_after_2015 <- data %>%
-  filter(t_img_date > as.Date("2015-12-31"))
-
-# Aggregate data by month
-monthly_data <- data_after_2015 %>%
-  group_by(month = floor_date(t_img_date, "month")) %>%
-  summarise(count = n())
 
 ggplot(monthly_data, aes(x = month, y = count)) +
   geom_line() +
@@ -176,7 +192,6 @@ ggplot(monthly_data, aes(x = month, y = count)) +
 ```{r}
 register_stadiamaps("f94c64ea-35d9-425f-af7a-e139e3bd6242", write = TRUE)
 
-continental_bbox <- c(left = -125, bottom = 24, right = -66, top = 49)
 continental_map <- get_stadiamap(bbox = continental_bbox, zoom = 5, maptype = "stamen_toner_lite")
 
 ggmap(continental_map) +
@@ -184,7 +199,6 @@ ggmap(continental_map) +
   labs(x = "Longitude", y = "Latitude", title = "Geographic Distribution of Turbines in Continental US") +
   theme_minimal()
 
-alaska_bbox <- c(left = -170, bottom = 52, right = -130, top = 72)
 alaska_map <- get_stadiamap(bbox = alaska_bbox, zoom = 4, maptype = "stamen_toner_lite")
 
 ggmap(alaska_map) +
@@ -192,7 +206,6 @@ ggmap(alaska_map) +
   labs(x = "Longitude", y = "Latitude", title = "Geographic Distribution of Turbines in Alaska") +
   theme_minimal()
 
-hawaii_bbox <- c(left = -160, bottom = 18, right = -154, top = 23)
 hawaii_map <- get_stadiamap(bbox = hawaii_bbox, zoom = 7, maptype = "stamen_toner_lite")
 
 ggmap(hawaii_map) +
@@ -205,7 +218,6 @@ ggmap(hawaii_map) +
 ```{r}
 
 # Correlation plot if there are multiple numeric variables
-numeric_data <- data %>% select_if(is.numeric)
 correlation_matrix <- cor(numeric_data, use = "complete.obs")
 print(ggplot(data = as.data.frame(as.table(correlation_matrix)),
        aes(x = Var1, y = Var2, fill = Freq)) +
