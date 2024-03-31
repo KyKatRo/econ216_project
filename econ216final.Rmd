@@ -33,7 +33,6 @@ summary(data)
 
 ## Histograms and Bar Plots
 
-Discuss the distribution of each variable using histograms for continuous variables and bar plots for categorical variables.
 
 ```{r}
 # Histogram for 'p_cap'
@@ -79,9 +78,6 @@ ggplot(data, aes(x = factor_variable_1, y = continuous_variable_1)) +
 
 ## Documentation of Findings
 
-Include comments and observations about each visualization to discuss the features of the data that are important for understanding your analysis. Highlight any issues or anomalies found during the exploratory phase and describe how they might impact your further analysis or decision-making process.
-
-Throughout this process, make sure to label all visualizations clearly with plain English descriptions of the variables on the axes or facet labels to ensure they are understandable and accessible.
 ```
 
 ```{r}
@@ -94,6 +90,10 @@ for (var in continuous_vars) {
           labs(x = var, y = "Frequency", title = paste("Distribution of", var)) +
           theme_minimal())
 }
+
+```
+
+```{r}
 
 # Bar plots for categorical variables (e.g., t_state, t_county, t_manu, t_model, retrofit, t_conf_atr, t_conf_loc)
 categorical_vars <- c("t_state", "t_manu", "t_model", "retrofit", "t_conf_atr", "t_conf_loc")
@@ -119,6 +119,10 @@ for (var in year_vars) {
           theme(axis.text.x = element_text(angle = 90, hjust = 1)))
 }
 
+```
+
+```{r}
+
 # Convert date to Date format
 data$t_img_date <- as.Date(data$t_img_date, format = "%m/%d/%Y")
 
@@ -127,17 +131,38 @@ ggplot(data, aes(x = t_img_date)) +
   geom_line(stat = "count", aes(group = 1)) +
   labs(x = "Date", y = "Count", title = "Number of Images Over Time")
 
+```
 
+```{r}
 register_stadiamaps("f94c64ea-35d9-425f-af7a-e139e3bd6242", write = TRUE)
-base_map <- get_stadiamap(bbox = c(left = min(data$xlong), bottom = min(data$ylat), 
-                                   right = max(data$xlong), top = max(data$ylat)), 
-                          zoom = 6, maptype = "stamen_toner_lite")
 
-# Now plot the map with points
-ggmap(base_map) +
+continental_bbox <- c(left = -125, bottom = 24, right = -66, top = 49)
+continental_map <- get_stadiamap(bbox = continental_bbox, zoom = 5, maptype = "stamen_toner_lite")
+
+ggmap(continental_map) +
   geom_point(data = data, aes(x = xlong, y = ylat, color = t_state), size = 1) +
-  labs(x = "Longitude", y = "Latitude", title = "Geographic Distribution of Turbines") +
+  labs(x = "Longitude", y = "Latitude", title = "Geographic Distribution of Turbines in Continental US") +
   theme_minimal()
+
+alaska_bbox <- c(left = -170, bottom = 52, right = -130, top = 72)
+alaska_map <- get_stadiamap(bbox = alaska_bbox, zoom = 4, maptype = "stamen_toner_lite")
+
+ggmap(alaska_map) +
+  geom_point(data = data, aes(x = xlong, y = ylat, color = t_state), size = 1) +
+  labs(x = "Longitude", y = "Latitude", title = "Geographic Distribution of Turbines in Alaska") +
+  theme_minimal()
+
+hawaii_bbox <- c(left = -160, bottom = 18, right = -154, top = 23)
+hawaii_map <- get_stadiamap(bbox = hawaii_bbox, zoom = 7, maptype = "stamen_toner_lite")
+
+ggmap(hawaii_map) +
+  geom_point(data = data, aes(x = xlong, y = ylat, color = t_state), size = 1) +
+  labs(x = "Longitude", y = "Latitude", title = "Geographic Distribution of Turbines in Hawaii") +
+  theme_minimal()
+  
+```
+
+```{r}
 
 # Correlation plot if there are multiple numeric variables
 numeric_data <- data %>% select_if(is.numeric)
@@ -149,7 +174,6 @@ print(ggplot(data = as.data.frame(as.table(correlation_matrix)),
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)))
 
-# Add comments for each visualization in R Markdown
 
 # End of EDA section with session information
 sessionInfo()
