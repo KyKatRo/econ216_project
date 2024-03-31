@@ -1,10 +1,10 @@
 ---
-title: "Econ 216 Final Project"
+title: "Econ 216 Exploratory Data Analysis"
 author: "Kyler Rosen, Raunak Bhumsaria, Gordon Bradley, and Alex Illchev"
 date: "`r Sys.Date()`"
 output: pdf_document
 ---
-##Introduction
+## Introduction
 
 
 In this project we aim to examine the geographic distribution and capacity characteristics of wind turbines in the United States using the US Wind Turbine Database (USWTDB). We plan to do this by analyzing the placement and various attributes of wind turbines in the US in hopes of finding insights into the wind energy landscape over all 50 states.
