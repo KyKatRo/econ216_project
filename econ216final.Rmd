@@ -5,6 +5,10 @@ date: "`r Sys.Date()`"
 output: pdf_document
 ---
 
+
+## Background
+The dataset we are using is the United States Wind Turbine Database (USWTDB). We retrieved this from: https://eerscmap.usgs.gov/uswtdb/ 
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
