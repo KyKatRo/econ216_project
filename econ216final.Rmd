@@ -161,6 +161,10 @@ print(ggplot(data = as.data.frame(as.table(correlation_matrix)),
        aes(x = Var1, y = Var2, fill = Freq)) +
   geom_tile() +
   scale_fill_gradient2(low = "blue", high = "red", mid = "white", midpoint = 0, limit = c(-1,1)) +
+  labs(title = "Correlation Matrix of Numeric Variables",
+       x = "Variable 1", 
+       y = "Variable 2", 
+       fill = "Correlation Coefficient") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1)))
 
