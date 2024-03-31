@@ -63,7 +63,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-## Load and Inspect Data
+## Data Wrangling
 
 ```{r}
 # Load necessary libraries
@@ -85,7 +85,7 @@ head(data)
 summary(data)
 ```
 
-## Data Wrangling
+
 ```{r}
 # Convert date to Date format
 ## We want it in the Date format since it allows us to do easier modifications to the variables
