@@ -97,7 +97,7 @@ ggplot(data, aes(x = factor_variable_1, y = continuous_variable_1)) +
 ```{r}
 # Histograms for continuous variables
 continuous_vars <- c("p_cap", "t_cap", "t_hh", "t_rd", "t_rsa", "t_ttlh")
-continuous_titles <- c("Turbine Power Capacity (MW)", "Turbine Rated Capacity (MW)", 
+continuous_titles <- c("Project Power Capacity (MW)", "Turbine Rated Capacity (kW)", 
                        "Turbine Hub Height (m)", "Turbine Rotor Diameter (m)", 
                        "Turbine Rotor Sweep Area (sq m)", "Total Turbine Height (m)")
 
