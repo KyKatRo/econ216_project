@@ -44,6 +44,11 @@ The dataset we are using is the United States Wind Turbine Database (USWTDB). We
 5. **t_hh, t_rd, t_rsa, t_ttlh:** These dimensions are essential for understanding turbine design and efficiency.
   
 
+The phenomenon under study is the geographic distribution and various attributes of wind turbines in the United States. The dataset being used for this Exploratory Data Analysis (EDA) is the United States Wind Turbine Database (USWTDB), which tracks the current locations and pertinent information of both land-based and offshore wind turbines across the country. This dataset includes a wealth of data points on over 70,000 wind turbines.
+
+To effectively analyze and interpret the data, one must consider the interplay between the column attributes and external factors such as economic incentives, technological advancements, environmental considerations, and policy changes. The goal of the EDA would be to use visualizations like maps, scatter plots, histograms, and time series charts to uncover patterns, correlations, and trends that could inform stakeholders and guide policy and investment decisions in the wind energy sector.
+
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
