@@ -7,7 +7,47 @@ output: pdf_document
 
 
 ## Background
-The dataset we are using is the United States Wind Turbine Database (USWTDB). We retrieved this from: https://eerscmap.usgs.gov/uswtdb/ 
+The dataset we are using is the United States Wind Turbine Database (USWTDB). We retrieved this from: https://eerscmap.usgs.gov/uswtdb/. What follows is the details about the dataset:
+
+### Dataset Structure:
+
+- **Observation Level:** Each observation represents a single wind turbine within the United States.
+- **Variables Included:** Here are the key variables contained in the dataset:
+
+1. **case_id:** Unique stable identification number for each turbine.
+2. **faa_ors, faa_asn:** Unique identifiers for cross-reference to FAA digital obstacle files and FAA obstruction evaluation airport airspace analysis dataset.
+3. **usgs_pr_id:** Unique identifier for cross-reference to the 2014 USGS turbine dataset.
+4. **t_state:** State where the turbine is located.
+5. **t_county, t_fips:** County and state FIPS code where the turbine is located.
+6. **p_name:** Name of the wind power project the turbine is a part of.
+7. **p_year:** Year that the turbine became operational.
+8. **p_tnum:** Number of turbines in the wind power project.
+9. **p_cap:** Cumulative capacity of all turbines in the project (in MW).
+10. **t_manu, t_model:** Turbine manufacturer and model.
+11. **t_cap:** Turbine rated capacity (in kW).
+12. **t_hh:** Turbine hub height (in meters).
+13. **t_rd:** Turbine rotor diameter (in meters).
+14. **t_rsa:** Turbine rotor swept area (in square meters).
+15. **t_ttlh:** Turbine total height from ground to tip of a blade (in meters).
+16. **retrofit, retrofit_year:** Indicator and year of partial retrofit, if applicable.
+17. **t_conf_atr, t_conf_loc:** Confidence levels in turbine attributes and location.
+18. **t_img_date, t_img_srce:** Date and source of image used to visually verify turbine location.
+19. **xlong, ylat:** Longitude and latitude of the turbine point.
+20. **eia_id:** Plant ID from the Energy Information Administration (EIA).
+
+### Important Variables for Analysis:
+
+1. **t_state:** Allows for analysis based on geographical location and comparison between states.
+2. **p_year:** Provides insight into the temporal distribution of wind turbine constructions.
+3. **p_tnum:** Helps in understanding the scale of wind power projects.
+4. **p_cap:** Indicates the total power capacity of wind projects, crucial for assessing energy generation potential.
+5. **t_hh, t_rd, t_rsa, t_ttlh:** These dimensions are essential for understanding turbine design and efficiency.
+  
+
+The phenomenon under study is the geographic distribution and various attributes of wind turbines in the United States. The dataset being used for this Exploratory Data Analysis (EDA) is the United States Wind Turbine Database (USWTDB), which tracks the current locations and pertinent information of both land-based and offshore wind turbines across the country. This dataset includes a wealth of data points on over 70,000 wind turbines.
+
+To effectively analyze and interpret the data, one must consider the interplay between the column attributes and external factors such as economic incentives, technological advancements, environmental considerations, and policy changes. The goal of the EDA would be to use visualizations like maps, scatter plots, histograms, and time series charts to uncover patterns, correlations, and trends that could inform stakeholders and guide policy and investment decisions in the wind energy sector.
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -41,7 +81,7 @@ summary(data)
 ```{r}
 # Histograms for continuous variables
 continuous_vars <- c("p_cap", "t_cap", "t_hh", "t_rd", "t_rsa", "t_ttlh")
-continuous_titles <- c("Turbine Power Capacity (MW)", "Turbine Rated Capacity (MW)", 
+continuous_titles <- c("Project Power Capacity (MW)", "Turbine Rated Capacity (kW)", 
                        "Turbine Hub Height (m)", "Turbine Rotor Diameter (m)", 
                        "Turbine Rotor Sweep Area (sq m)", "Total Turbine Height (m)")
 
