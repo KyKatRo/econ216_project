@@ -1,0 +1,203 @@
+---
+title: "Econ 216 Presentation Figures"
+author: "Kyler Rosen, Raunak Bhumsaria, Gordon Bradley, and Alex Illchev"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Data Wrangling
+
+```{r}
+# Load necessary libraries
+library(tidyverse)
+library(lubridate)
+library(ggmap)
+library(dplyr)
+library(patchwork)
+
+us_map <- map_data("state")
+
+
+# Load the data
+data <- read.csv("uswtdb_v4_3_20220114.csv")
+
+# Inspect the first few rows of the data
+head(data)
+
+# Summarize the data to understand its structure
+summary(data)
+```
+
+
+```{r}
+# Convert date to Date format
+## We want it in the Date format since it allows us to do easier modifications to the variables
+data$t_img_date <- as.Date(data$t_img_date, format = "%m/%d/%Y")
+
+
+## Data pre-2015 seems very unreliable pre-2015 so I am cutting off before then.
+data_after_2015 <- data %>%
+  filter(t_img_date > as.Date("2014-12-31"))
+
+
+# Aggregate data by month
+## Data is very noisy so collecting by month makes the data bit easier to parse.
+monthly_data <- data_after_2015 %>%
+  group_by(month = floor_date(t_img_date, "month")) %>%
+  summarise(count = n())
+
+## Need to establish bounding boxes on geographic areas for the maps
+continental_bbox <- c(left = -125, bottom = 24, right = -66, top = 49)
+alaska_bbox <- c(left = -170, bottom = 52, right = -130, top = 72)
+hawaii_bbox <- c(left = -160, bottom = 18, right = -154, top = 23)
+
+## Grabbing all numeric data for a rough analysis
+numeric_data <- data %>% select_if(is.numeric)
+
+register_stadiamaps("f94c64ea-35d9-425f-af7a-e139e3bd6242", write = TRUE)
+
+```
+
+```{r}
+
+continental_map <- get_stadiamap(bbox = continental_bbox, zoom = 5, maptype = "stamen_toner_lite")
+continental_plot <- ggmap(continental_map) +
+  geom_point(data = data, aes(x = xlong, y = ylat), color = "red", size = 1) +
+  labs(x = "Longitude", y = "Latitude", title = "Geographic Distribution of Turbines in Continental US") +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+ggsave("figures/continental_us_turbines.png", continental_plot, bg = "transparent")
+
+alaska_map <- get_stadiamap(bbox = alaska_bbox, zoom = 4, maptype = "stamen_toner_lite")
+alaska_plot <- ggmap(alaska_map) +
+  geom_point(data = data, aes(x = xlong, y = ylat), color = "red", size = 1) +
+  labs(x = "Longitude", y = "Latitude", title = "Geographic Distribution of Turbines in Alaska") +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+ggsave("figures/alaska_turbines.png", alaska_plot, bg = "transparent")
+
+hawaii_map <- get_stadiamap(bbox = hawaii_bbox, zoom = 7, maptype = "stamen_toner_lite")
+hawaii_plot <- ggmap(hawaii_map) +
+  geom_point(data = data, aes(x = xlong, y = ylat), color = "red", size = 1) +
+  labs(x = "Longitude", y = "Latitude", title = "Geographic Distribution of Turbines in Hawaii") +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+ggsave("figures/hawaii_turbines.png", hawaii_plot, bg = "transparent")
+
+  
+```
+
+```{r}
+state_counts <- data %>%
+  group_by(t_state) %>%
+  summarise(Count = n()) %>%
+  ungroup() %>%
+  arrange(desc(Count))  
+
+state_counts$t_state <- factor(state_counts$t_state, levels = state_counts$t_state)
+
+bar <- ggplot(state_counts, aes(x = t_state, y = Count, fill = t_state)) +
+  geom_bar(stat = "identity", color = "black") +  
+  labs(x = "State", y = "Count", title = "Turbine Count by State") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
+  theme(legend.position = "none")
+
+print(bar)
+ggsave("figures/state_turbines_amount.png", bar, bg = "transparent")
+
+```
+
+
+```{r}
+gaussian_jitter <- function(data, amount=1) {
+  data + rnorm(length(data), mean=0, sd=amount)
+}
+
+plot <- ggplot(data, aes(x = gaussian_jitter(t_rd, 3), y = gaussian_jitter(t_hh, 3), color = t_cap)) +
+  geom_point(position = position_jitter(width = 3, height = 3), alpha = 0.05) +
+  
+  scale_color_gradient(low = "blue", high = "red") +
+  labs(x = "Rotor Diameter (meters)",
+       y = "Hub Height (meters)",
+       color = "Rated Capacity (MW)",
+       title = "Turbine Rotor Diameter vs Hub Height by Rated Capacity") +
+  theme_minimal()
+
+print(plot)
+ggsave("figures/specs_effect.png", plot, bg = "transparent")
+
+```
+
+```{r}
+continental_map <- get_stadiamap(bbox = continental_bbox, zoom = 5, maptype = "stamen_toner_lite")
+continental_plot <- ggmap(continental_map) +
+  stat_density2d(data = data, aes(x = xlong, y = ylat, fill = ..level..), geom = "polygon", alpha = 0.5) +
+  scale_fill_viridis_c(option = "C") +
+  labs(x = "Longitude", y = "Latitude", title = "Geographic Distribution of Turbines in Continental US") +
+  theme_minimal() +
+  theme(legend.position = "right")
+print(continental_plot)
+ggsave("figures/continental_turbines_heatmap.png", continental_plot, bg = "transparent")
+```
+
+```{r}
+plot2 <- ggplot(data, aes_string(x = "t_cap")) +
+         geom_histogram(binwidth = 100, fill = "blue", color = "black") +
+         labs(x = "Turbine Rated Capacity (kW)", y = "Frequency", title = "Distribution of Turbine Rated Capacity (kW)") +
+         theme_minimal()
+print(plot2)
+ggsave("figures/t_cap.png", plot = plot2, bg = "transparent")
+
+plot3 <- ggplot(data, aes_string(x = "t_hh")) +
+         geom_histogram(binwidth = 5, fill = "blue", color = "black") +
+         labs(x = "Turbine Hub Height (m)", y = "Frequency", title = "Distribution of Turbine Hub Height (m)") +
+         theme_minimal()
+print(plot3)
+ggsave("figures/hub_height.png", plot = plot3, bg = "transparent")
+
+plot4 <- ggplot(data, aes_string(x = "t_rd")) +
+         geom_histogram(binwidth = 2.5, fill = "blue", color = "black") +
+         labs(x = "Turbine Rotor Diameter (m)", y = "Frequency", title = "Distribution of Turbine Rotor Diameter (m)") +
+         theme_minimal()
+print(plot4)
+ggsave("figures/rotor_diameter.png", plot = plot4, bg = "transparent")
+
+```
+
+```{r}
+register_stadiamaps("f94c64ea-35d9-425f-af7a-e139e3bd6242", write = TRUE)
+
+continental_bbox <- c(left = -125, bottom = 25, right = -66, top = 49) # Adjust as needed
+continental_map <- get_stadiamap(bbox = continental_bbox, zoom = 5, maptype = "stamen_toner_lite")
+
+data_filtered <- data %>%
+  filter(!is.na(p_cap), !is.na(t_cap), !is.na(t_hh), !is.na(t_rd))
+
+plot2 <- ggmap(continental_map) +
+  geom_point(data = data_filtered, aes(x = xlong, y = ylat, color = t_cap), size = 1, alpha = 0.2) +
+  scale_color_gradient(low = "yellow", high = "red") +
+  labs(x = "Longitude", y = "Latitude", title = "Geographic Distribution by Turbine Rated Capacity (kW)") +
+  theme_minimal()
+print(plot2)
+ggsave("figures/t_cap_map.png", plot = plot2, bg = "transparent")
+
+plot4 <-  ggmap(continental_map) +
+  geom_point(data = data_filtered, aes(x = xlong, y = ylat, color = t_rd), size = 1, alpha = 0.2) +
+  scale_color_gradient(low = "lightblue", high = "darkblue") +
+  labs(x = "Longitude", y = "Latitude", title = "Geographic Distribution by Turbine Rotor Diameter (m)") +
+  theme_minimal()
+print(plot4)
+ggsave("figures/rotor_diameter_map.png", plot = plot4, bg = "transparent")
+```
+
+
+
