@@ -1,4 +1,4 @@
 # econ216_project
 
 
-[test pdf](econ216EDA.pdf)
+[Final Report](econ216EDA.pdf)
